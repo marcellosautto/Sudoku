@@ -11,7 +11,6 @@ public:
 
 private:
     int grid[9][9];
-    int gridCopy[9][9]; //copy of original grid (used to make sure the user does not overwrite original values)
   
     void initializeSudokuGrid();
     //Function to promt the user to specify the numbers of the
@@ -22,7 +21,7 @@ private:
     bool printSudokuGrid();
     //Function to print the sudoku grid.
 
-    bool solveSudoku(int row, int col, bool isDeadEnd);
+    bool solveSudoku(int row, int col, int num);
     //Funtion to solve the sudoku problem.
     //Postcondition: If a solution exits, it returns true,
     //    otherwise it returns false.
@@ -53,9 +52,9 @@ private:
     //Postcondition: Returns true if num is in small grid,
     //    otherwise it returns false.
 
-    bool findNum(int row, int col, int num); //finds a number to place in an empty grid spot
+    //bool findNum(int row, int col, int num); //finds a number to place in an empty grid spot
 
-    bool findReplacement(int row, int col, int num); //finds a number to replace a value when backtracking
+    //bool findReplacement(int row, int col, int num); //finds a number to replace a value when backtracking
 
     bool noSolution(); //prints "no solution" if solution does not exist
 

@@ -14,8 +14,7 @@ sudoku::sudoku()
 bool sudoku::run()
 {
 	initializeSudokuGrid();
-	system("cls");
-	if (solveSudoku(0, 0, false)) //if a solution is found, print sudoku grid, if not, print no solution
+	if (solveSudoku(0, 0, 1)) //if a solution is found, print sudoku grid, if not, print no solution
 		return printSudokuGrid();
 	else
 		return noSolution();
@@ -40,52 +39,37 @@ void sudoku::initializeSudokuGrid() //initializes the sudoku grid
 		rowNum++;
 	}
 
-	for (int k = 0; k < 9; k++)
+	system("cls");
+	cout << "Original Sudoku Grid:" << endl << endl;
+	for (int i = 0; i < 9; i++)
 	{
-		for (int l = 0; l < 9; l++)
-			gridCopy[k][l] = grid[k][l];
+		for (int j = 0; j < 9; j++)
+			cout << grid[i][j] << " ";
+		cout << endl;
 	}
 }
 
-bool sudoku::solveSudoku(int row, int col, bool isDeadEnd)
+bool sudoku::solveSudoku(int row, int col, int num)
 {
-	if (row == 9) //we found a solution
-		return true;
-	else if (row == -1) //there is no solution
-		return false;
-	
-	if (col > 8) //go to the next row
-	{
-		col = 0;
-		row++;
-	}
-
-	else if (col < 0) //go to the prev row
-	{
-		col = 8;
-		row--;
-	}
-
-	if (findEmptyGridSlot(row, col) && !findNum(row, col, 1)) //if there's an empty grid slot and there isn't a number which can be placed there, we've reached a dead end
-	{
-		isDeadEnd = true;
-		solveSudoku(row, col - 1, isDeadEnd);
-	}
-
-	else if (isDeadEnd == true) //if we reached a dead end, check if the grid slot we backtracked to is still a dead end, if not, increment it by 1 and continue solving
-	{
-		if (grid[row][col] != gridCopy[row][col] && findReplacement(row, col, grid[row][col] + 1)) //if the current grid slot is not a part of the original grid and there's another value that can be placed there, place it and proceed
+	for (int r = 0; r < 9; r++)
+		for (int c = 0; c < 9; c++)
 		{
-			isDeadEnd = false;
-			solveSudoku(row, col + 1, isDeadEnd);
+			if (findEmptyGridSlot(r, c))
+			{
+				num = grid[r][c];
+				for (int n = num + 1; n <= 9; n++)
+				{
+					if (canPlaceNum(r, c, n))
+					{
+						grid[r][c] = n;
+						if (solveSudoku(r, c, n))
+							return true;
+					}
+				}
+				grid[row][col] = 0;
+				return false;
+			}
 		}
-
-		else //no replacement found, go back another space
-			solveSudoku(row, col - 1, isDeadEnd);
-	}
-
-	else //keep looking
-		solveSudoku(row, col + 1, isDeadEnd);
 }
 
 bool sudoku::findEmptyGridSlot(int row, int col) //if the grid slot is empty, return true
@@ -98,7 +82,7 @@ bool sudoku::findEmptyGridSlot(int row, int col) //if the grid slot is empty, re
 
 bool sudoku::canPlaceNum(int row, int col, int num) //if the number is not in the same row, column, or 3x3 grid, it can be placed
 {
-	if (!numAlreadyInRow(row, num) && !numAlreadyInCol(col, num) && !numAlreadyInBox(row - row % 3, col - col % 3, num) && num != 10)
+	if (!numAlreadyInRow(row, num) && !numAlreadyInCol(col, num) && !numAlreadyInBox(row - row % 3, col - col % 3, num))
 		return true;
 	else
 		return false;
@@ -131,51 +115,8 @@ bool sudoku::numAlreadyInBox(int smallGridRow, int smallGridCol, int num) //chec
 
 }
 
-bool sudoku::findNum(int row, int col, int num)
-{
-	if (canPlaceNum(row, col, num)) //if the number being looked at is not in the same row, column or 3x3 space, assign that value to the grid spot and continue through the grid
-	{
-		grid[row][col] = num;
-		return true;
-	}
-
-	else if (num < 9) //go to the next number
-		return findNum(row, col, num + 1);
-
-	else
-		return false;
-}
-
-bool sudoku::findReplacement(int row, int col, int num)
-{
-
-	if (canPlaceNum(row, col, num)) //if the number being looked at is not in the same row, column or 3x3 space, assign that value to the grid spot and continue through the grid
-	{
-		grid[row][col] = num;
-		return true;
-	}
-
-	else if (num < 9) //start from the current value and go up
-		return findReplacement(row, col, num + 1);
-
-	else //no value found, set grid space to 0
-	{
-		grid[row][col] = 0;
-		return false;
-	}
-
-}
-
 bool sudoku::printSudokuGrid() //prints solution
 {
-	cout << "Original Sudoku Grid:" << endl << endl;
-	for (int i = 0; i < 9; i++)
-	{
-		for (int j = 0; j < 9; j++)
-			cout << gridCopy[i][j] << " ";
-		cout << endl;
-	}
-
 	cout << endl << endl << "Solution:" << endl << endl;
 	for (int i = 0; i < 9; i++)
 	{
